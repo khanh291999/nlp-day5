@@ -1,11 +1,3 @@
-## Thành viên nhóm
-
-| Họ và tên | MSSV |
-|-----------|------|
-| Lê Tấn Kiên | 2591309 |
-| Đỗ Quốc Khánh | 2591307 |
-| Nguyễn Trương Hoàng Hiếu | 2591304 |
-
 # 📘 HƯỚNG DẪN CÀI ĐẶT VÀ CHẠY ỨNG DỤNG MULTI-PURPOSE LLM TOOL
 
 ## 📋 MỤC LÚC
