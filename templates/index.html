@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Purpose LLM Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent),
+                        radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.2), transparent),
+                        radial-gradient(circle at 40% 20%, rgba(67, 233, 123, 0.2), transparent);
+            pointer-events: none;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5), 
+                        0 0 0 1px rgba(255, 255, 255, 0.1);
+            max-width: 1000px;
+            width: 100%;
+            padding: 50px;
+            position: relative;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            font-size: 3em;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            font-weight: 400;
+        }
+
+        .powered-by {
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .ollama-logo {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        #userInput {
+            width: 100%;
+            min-height: 160px;
+            padding: 18px;
+            border: 2px solid #e8e8e8;
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: #fafafa;
+            line-height: 1.6;
+        }
+
+        #userInput:hover {
+            border-color: #d0d0d0;
+            background: #fff;
+        }
+
+        #userInput:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .buttons-section {
+            margin-bottom: 30px;
+        }
+
+        .buttons-label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .task-button {
+            padding: 18px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: white;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .task-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .task-button:hover::before {
+            left: 100%;
+        }
+
+        .task-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .task-button:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .task-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-summarize {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-translate {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-explain {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .btn-keywords {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .btn-code {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .result-section {
+            margin-top: 30px;
+        }
+
+        .result-label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        #result {
+            width: 100%;
+            min-height: 180px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border: 2px solid #e8e8e8;
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.7;
+            color: #333;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        #result.has-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-color: #667eea;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .loading.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .spinner-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(102, 126, 234, 0.1);
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .loading-dots {
+            display: inline-block;
+            animation: dots 1.4s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .error {
+            color: #dc3545;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+            padding: 18px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 2px solid #ffcccb;
+            font-weight: 500;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+            text-align: center;
+        }
+
+        .provider-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 12px 24px;
+            border-radius: 50px;
+            color: #666;
+            font-size: 0.95em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #43e97b;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 2.2em;
+            }
+
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .subtitle {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="ai-badge">
+                ⚡ AI-Powered
+            </div>
+            <h1>Multi-Purpose LLM Tool</h1>
+            <p class="subtitle">Transform your text with the power of AI</p>
+            <p class="powered-by">
+                <span class="status-dot"></span>
+                Powered by <span class="ollama-logo">Ollama</span>
+            </p>
+        </div>
+
+        <div class="input-section">
+            <label for="userInput">Your Text:</label>
+            <textarea 
+                id="userInput" 
+                placeholder="Enter your text here..."
+            ></textarea>
+        </div>
+
+        <div class="buttons-section">
+            <span class="buttons-label">Choose a Task:</span>
+            <div class="button-grid">
+                <button class="task-button btn-summarize" data-task="summarize">
+                    📝 Summarize
+                </button>
+                <button class="task-button btn-translate" data-task="translate">
+                    🇫🇷 Translate to French
+                </button>
+                <button class="task-button btn-explain" data-task="explain">
+                    👶 Explain Like I'm 5
+                </button>
+                <button class="task-button btn-keywords" data-task="keywords">
+                    🔑 Extract Keywords
+                </button>
+                <button class="task-button btn-code" data-task="code">
+                    💻 Generate Python Code
+                </button>
+            </div>
+        </div>
+
+        <div class="loading">
+            <div class="spinner-container">
+                <div class="spinner"></div>
+                <span class="loading-text">Processing your request<span class="loading-dots">...</span></span>
+            </div>
+        </div>
+
+        <div class="result-section">
+            <span class="result-label">Result:</span>
+            <div id="result">✨ Your AI-generated result will appear here...</div>
+        </div>
+
+        <div class="footer">
+            <div class="provider-info" id="providerInfo">
+                <span class="status-dot"></span>
+                Loading...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const userInput = document.getElementById('userInput');
+        const resultDiv = document.getElementById('result');
+        const loadingDiv = document.querySelector('.loading');
+        const taskButtons = document.querySelectorAll('.task-button');
+        const providerInfo = document.getElementById('providerInfo');
+
+        // Load provider info
+        fetch('/health')
+            .then(response => response.json())
+            .then(data => {
+                providerInfo.innerHTML = `<span class="status-dot"></span> ${data.provider} - Model: <strong>${data.model}</strong>`;
+            })
+            .catch(error => {
+                providerInfo.innerHTML = '<span class="status-dot" style="background: #dc3545;"></span> Provider info unavailable';
+            });
+
+        // Add click event to all task buttons
+        taskButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const task = button.getAttribute('data-task');
+                processTask(task);
+            });
+        });
+
+        async function processTask(task) {
+            const text = userInput.value.trim();
+
+            if (!text) {
+                resultDiv.innerHTML = '<span class="error">⚠️ Please enter some text first!</span>';
+                return;
+            }
+
+            // Show loading, disable buttons
+            loadingDiv.classList.add('active');
+            taskButtons.forEach(btn => btn.disabled = true);
+            resultDiv.textContent = 'Processing...';
+
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        task: task
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.textContent = data.result;
+                    resultDiv.classList.add('has-content');
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Error: ${data.error}</span>`;
+                    resultDiv.classList.remove('has-content');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Network error: ${error.message}</span>`;
+            } finally {
+                // Hide loading, enable buttons
+                loadingDiv.classList.remove('active');
+                taskButtons.forEach(btn => btn.disabled = false);
+            }
+        }
+
+        // Optional: Allow Enter key to submit (Ctrl+Enter)
+        userInput.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                taskButtons[0].click();
+            }
+        });
+    </script>
+</body>
+</html>
