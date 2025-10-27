@@ -397,41 +397,41 @@
     <div class="container">
         <div class="header">
             <div class="ai-badge">
-                ⚡ AI-Powered
+                ⚡ Hỗ trợ bởi AI
             </div>
-            <h1>Multi-Purpose LLM Tool</h1>
-            <p class="subtitle">Transform your text with the power of AI</p>
+            <h1>Công Cụ LLM Đa Năng</h1>
+            <p class="subtitle">Biến đổi văn bản của bạn với sức mạnh của AI</p>
             <p class="powered-by">
                 <span class="status-dot"></span>
-                Powered by <span class="ollama-logo">Ollama</span>
+                Được hỗ trợ bởi <span class="ollama-logo">Ollama</span>
             </p>
         </div>
 
         <div class="input-section">
-            <label for="userInput">Your Text:</label>
+            <label for="userInput">Văn bản của bạn:</label>
             <textarea 
                 id="userInput" 
-                placeholder="Enter your text here..."
+                placeholder="Nhập văn bản của bạn tại đây..."
             ></textarea>
         </div>
 
         <div class="buttons-section">
-            <span class="buttons-label">Choose a Task:</span>
+            <span class="buttons-label">Chọn chức năng:</span>
             <div class="button-grid">
                 <button class="task-button btn-summarize" data-task="summarize">
-                    📝 Summarize
+                    📝 Tóm tắt
                 </button>
                 <button class="task-button btn-translate" data-task="translate">
-                    🇫🇷 Translate to French
+                    🇫🇷 Dịch sang tiếng Pháp
                 </button>
                 <button class="task-button btn-explain" data-task="explain">
-                    👶 Explain Like I'm 5
+                    👶 Giải thích đơn giản
                 </button>
                 <button class="task-button btn-keywords" data-task="keywords">
-                    🔑 Extract Keywords
+                    🔑 Trích xuất từ khóa
                 </button>
                 <button class="task-button btn-code" data-task="code">
-                    💻 Generate Python Code
+                    💻 Tạo code Python
                 </button>
             </div>
         </div>
@@ -439,19 +439,19 @@
         <div class="loading">
             <div class="spinner-container">
                 <div class="spinner"></div>
-                <span class="loading-text">Processing your request<span class="loading-dots">...</span></span>
+                <span class="loading-text">Đang xử lý yêu cầu<span class="loading-dots">...</span></span>
             </div>
         </div>
 
         <div class="result-section">
-            <span class="result-label">Result:</span>
-            <div id="result">✨ Your AI-generated result will appear here...</div>
+            <span class="result-label">Kết quả:</span>
+            <div id="result">✨ Kết quả từ AI sẽ hiển thị tại đây...</div>
         </div>
 
         <div class="footer">
             <div class="provider-info" id="providerInfo">
                 <span class="status-dot"></span>
-                Loading...
+                Đang tải...
             </div>
         </div>
     </div>
@@ -467,10 +467,10 @@
         fetch('/health')
             .then(response => response.json())
             .then(data => {
-                providerInfo.innerHTML = `<span class="status-dot"></span> ${data.provider} - Model: <strong>${data.model}</strong>`;
+                providerInfo.innerHTML = `<span class="status-dot"></span> ${data.provider} - Mô hình: <strong>${data.model}</strong>`;
             })
             .catch(error => {
-                providerInfo.innerHTML = '<span class="status-dot" style="background: #dc3545;"></span> Provider info unavailable';
+                providerInfo.innerHTML = '<span class="status-dot" style="background: #dc3545;"></span> Không thể kết nối';
             });
 
         // Add click event to all task buttons
@@ -485,14 +485,14 @@
             const text = userInput.value.trim();
 
             if (!text) {
-                resultDiv.innerHTML = '<span class="error">⚠️ Please enter some text first!</span>';
+                resultDiv.innerHTML = '<span class="error">⚠️ Vui lòng nhập văn bản trước!</span>';
                 return;
             }
 
             // Show loading, disable buttons
             loadingDiv.classList.add('active');
             taskButtons.forEach(btn => btn.disabled = true);
-            resultDiv.textContent = 'Processing...';
+            resultDiv.textContent = 'Đang xử lý...';
 
             try {
                 const response = await fetch('/process', {
@@ -512,11 +512,11 @@
                     resultDiv.textContent = data.result;
                     resultDiv.classList.add('has-content');
                 } else {
-                    resultDiv.innerHTML = `<span class="error">❌ Error: ${data.error}</span>`;
+                    resultDiv.innerHTML = `<span class="error">❌ Lỗi: ${data.error}</span>`;
                     resultDiv.classList.remove('has-content');
                 }
             } catch (error) {
-                resultDiv.innerHTML = `<span class="error">❌ Network error: ${error.message}</span>`;
+                resultDiv.innerHTML = `<span class="error">❌ Lỗi kết nối: ${error.message}</span>`;
             } finally {
                 // Hide loading, enable buttons
                 loadingDiv.classList.remove('active');
